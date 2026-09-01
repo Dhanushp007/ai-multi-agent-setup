@@ -1,0 +1,16 @@
+#!/bin/sh
+# .NET pre-commit hook: runs dotnet format on staged .cs files.
+
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep '\.cs$')
+
+if [ -z "$staged" ]; then
+  exit 0
+fi
+
+if command -v dotnet >/dev/null 2>&1; then
+  dotnet format --verify-no-changes --no-restore 2>/dev/null
+  if [ $? -ne 0 ]; then
+    echo "ERROR: dotnet format check failed. Run 'dotnet format' to fix."
+    exit 1
+  fi
+fi

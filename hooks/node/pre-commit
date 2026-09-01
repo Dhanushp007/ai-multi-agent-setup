@@ -1,0 +1,21 @@
+#!/bin/sh
+# Node.js pre-commit hook: runs lint-staged if available, else ESLint + Prettier on staged files.
+
+if [ -f "package.json" ] && grep -q "lint-staged" package.json; then
+  npx lint-staged
+  exit $?
+fi
+
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|ts|jsx|tsx|json|css|md)$')
+
+if [ -z "$staged" ]; then
+  exit 0
+fi
+
+echo "$staged" | xargs npx prettier --check 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo "ERROR: Prettier check failed. Run 'npx prettier --write .' to fix."
+  exit 1
+fi
+
+echo "$staged" | xargs npx eslint 2>/dev/null

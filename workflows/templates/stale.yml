@@ -1,0 +1,64 @@
+name: Stale Issue & PR Management
+# Marks issues/PRs stale after inactivity and closes them if unaddressed.
+
+on:
+  workflow_call:
+    inputs:
+      days-before-issue-stale:
+        description: Days of inactivity before marking an issue stale
+        type: number
+        default: 30
+      days-before-pr-stale:
+        description: Days of inactivity before marking a PR stale
+        type: number
+        default: 14
+      days-before-close:
+        description: Days after stale label before closing
+        type: number
+        default: 7
+
+jobs:
+  stale:
+    name: Manage stale items
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-issue-stale: ${{ inputs.days-before-issue-stale }}
+          days-before-pr-stale: ${{ inputs.days-before-pr-stale }}
+          days-before-close: ${{ inputs.days-before-close }}
+
+          stale-issue-label: stale
+          stale-pr-label: stale
+
+          stale-issue-message: >
+            This issue has been automatically marked as **stale** after
+            ${{ inputs.days-before-issue-stale }} days of inactivity.
+            It will be closed in ${{ inputs.days-before-close }} days unless there is new activity.
+            Remove the `stale` label or leave a comment to keep it open.
+
+          stale-pr-message: >
+            This pull request has been automatically marked as **stale** after
+            ${{ inputs.days-before-pr-stale }} days of inactivity.
+            It will be closed in ${{ inputs.days-before-close }} days unless there is new activity.
+            Rebase and push to reset the clock.
+
+          close-issue-message: >
+            Closed due to inactivity. Please reopen if this is still relevant.
+
+          close-pr-message: >
+            Closed due to inactivity. Please reopen and rebase if you'd like to continue.
+
+          # Labels that exempt an item from ever being marked stale
+          exempt-issue-labels: "pinned,security,in-progress,blocked"
+          exempt-pr-labels: "pinned,security,in-progress,do-not-merge"
+
+          # Never close issues attached to a milestone
+          exempt-all-milestones: true
+
+          # Do not process more than this many items per run (API rate limit safety)
+          operations-per-run: 100

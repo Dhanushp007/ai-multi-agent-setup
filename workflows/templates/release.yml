@@ -1,0 +1,82 @@
+name: Release
+# Creates a GitHub Release from the latest semver tag.
+# Trigger this workflow after pushing a vX.Y.Z tag:
+#   git tag -a v1.2.0 -m "Release v1.2.0" && git push --tags
+
+on:
+  workflow_call:
+    inputs:
+      draft:
+        description: Publish as a draft release (for manual review before going live)
+        type: boolean
+        default: false
+      prerelease:
+        description: Mark as a pre-release (e.g., alpha, beta, rc)
+        type: boolean
+        default: false
+      generate-notes:
+        description: Auto-generate release notes from commits since previous tag
+        type: boolean
+        default: true
+    outputs:
+      release-url:
+        description: URL of the created GitHub Release
+        value: ${{ jobs.release.outputs.release-url }}
+      version:
+        description: Released version (e.g., v1.2.0)
+        value: ${{ jobs.release.outputs.version }}
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    outputs:
+      release-url: ${{ steps.create.outputs.html_url }}
+      version: ${{ steps.resolve-tag.outputs.tag }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag
+        id: resolve-tag
+        run: |
+          # Use GITHUB_REF_NAME if triggered by a tag push, else find the latest tag
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+            echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify tag is semver
+        run: |
+          TAG="${{ steps.resolve-tag.outputs.tag }}"
+          if ! echo "$TAG" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "❌ Tag '$TAG' is not a valid semver tag (expected vX.Y.Z)"
+            exit 1
+          fi
+          echo "✅ Tag: $TAG"
+
+      - name: Create GitHub Release
+        id: create
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tag = '${{ steps.resolve-tag.outputs.tag }}';
+            const { data: release } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: `Release ${tag}`,
+              draft: ${{ inputs.draft }},
+              prerelease: ${{ inputs.prerelease }},
+              generate_release_notes: ${{ inputs.generate-notes }},
+            });
+            console.log(`✅ Release created: ${release.html_url}`);
+            return release.html_url;
+          result-encoding: string

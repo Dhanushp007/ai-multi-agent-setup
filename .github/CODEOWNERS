@@ -1,0 +1,19 @@
+# Code Owners — Setup Repository
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global fallback — all files not matched below
+* @your-org/core-team
+
+# CI/CD and GitHub configuration
+.github/workflows/   @your-org/devops-team
+.github/dependabot.yml @your-org/security-team
+workflows/           @your-org/devops-team
+
+# Security-sensitive
+mcp/                 @your-org/devops-team
+hooks/               @your-org/devops-team
+scripts/             @your-org/devops-team
+
+# Copilot agent and command definitions
+agents/              @your-org/core-team
+commands/            @your-org/core-team

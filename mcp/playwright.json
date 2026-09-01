@@ -1,0 +1,11 @@
+{
+  // description: Playwright MCP server — enables Copilot to automate browsers,
+  // run E2E tests, and inspect live web pages.
+  // Best suited for: web projects with E2E testing needs.
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  }
+}

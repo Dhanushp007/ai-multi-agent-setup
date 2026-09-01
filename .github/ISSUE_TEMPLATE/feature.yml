@@ -1,0 +1,55 @@
+name: Feature Request
+description: Propose a new agent, command, hook, workflow template, or config
+labels: ["enhancement", "triage"]
+
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Agent
+        - CLI Command
+        - Git Hook
+        - GitHub Actions Workflow Template
+        - MCP Server Config
+        - VS Code Setting
+        - Script / Apply Tool
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      placeholder: Describe the pain point or missing capability...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      placeholder: Describe what you'd like to see added or changed...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      placeholder: Any other approaches you've thought about?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Low — nice to have
+        - Medium — would improve my workflow
+        - High — blocking me or my team
+    validations:
+      required: true

@@ -1,0 +1,15 @@
+{
+  // description: Filesystem MCP server — allows Copilot to read/write files
+  // beyond the workspace root (e.g., shared config dirs, monorepo siblings).
+  // Set ALLOWED_PATHS to restrict access.
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${env:ALLOWED_PATHS}"
+      ]
+    }
+  }
+}

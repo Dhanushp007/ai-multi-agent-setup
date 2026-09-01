@@ -1,0 +1,62 @@
+name: PR Checks
+# Validates PR title format (Conventional Commits) and warns on large PRs.
+
+on:
+  workflow_call:
+    inputs:
+      max-lines:
+        description: Line change threshold to trigger a size warning (0 = disabled)
+        type: number
+        default: 500
+
+jobs:
+  conventional-title:
+    name: Conventional commit title
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Allowed commit types
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            test
+            chore
+            ci
+            perf
+            revert
+          requireScope: false
+          # Subject must start with lowercase
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject "{subject}" must start with a lowercase letter.
+            Example: "feat(auth): add OAuth2 support"
+
+  pr-size:
+    name: PR size check
+    runs-on: ubuntu-latest
+    if: inputs.max-lines > 0
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            const changed = pr.additions + pr.deletions;
+            const limit = ${{ inputs.max-lines }};
+            if (changed > limit) {
+              core.warning(
+                `⚠️ This PR changes ${changed} lines (threshold: ${limit}). ` +
+                `Consider splitting it into smaller, focused PRs.`
+              );
+            } else {
+              console.log(`✅ PR size: ${changed} lines (limit: ${limit})`);
+            }

@@ -1,0 +1,118 @@
+name: Validate Repository Configs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    name: Validate all configs
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate YAML syntax
+        run: |
+          find . -name "*.yml" -o -name "*.yaml" \
+            | grep -v "^./.git/" \
+            | while read -r f; do
+                python3 -c "import yaml,sys; yaml.safe_load(open(sys.argv[1]))" "$f" \
+                  || { echo "❌ Invalid YAML: $f"; exit 1; }
+              done
+          echo "✅ All YAML files valid"
+
+      - name: Validate JSON syntax (supports JSONC comments)
+        run: |
+          python3 << 'EOF'
+          import re, json, os, sys
+
+          def load_jsonc(path):
+              content = open(path).read()
+              content = re.sub(r'//.*$', '', content, flags=re.MULTILINE)
+              return json.loads(content)
+
+          failed = []
+          for root, dirs, files in os.walk('.'):
+              dirs[:] = [d for d in dirs if d != '.git']
+              for f in files:
+                  if not f.endswith('.json'):
+                      continue
+                  path = os.path.join(root, f)
+                  try:
+                      load_jsonc(path)
+                  except Exception as e:
+                      failed.append(f"{path}: {e}")
+
+          if failed:
+              for e in failed:
+                  print(f"❌ {e}")
+              sys.exit(1)
+          print(f"✅ All JSON files valid")
+          EOF
+
+      - name: Check hook scripts have shebangs
+        run: |
+          failed=0
+          while IFS= read -r -d '' f; do
+            if ! head -1 "$f" | grep -q "^#!"; then
+              echo "❌ Missing shebang: $f"
+              failed=1
+            fi
+          done < <(find hooks -type f ! -name "*.ps1" -print0)
+          [ "$failed" -eq 0 ] && echo "✅ All hook scripts have shebangs"
+          exit $failed
+
+      - name: Validate agent files have required fields
+        run: |
+          python3 << 'EOF'
+          import os, sys, re
+
+          required_fields = ['name:', 'description:', 'tools:', 'model:']
+          failed = []
+
+            agent_dir = '.github/agents'
+            for fname in os.listdir(agent_dir):
+              if not fname.endswith('.md'):
+                  continue
+              path = f'{agent_dir}/{fname}'
+              try:
+                  content = open(path).read()
+                  missing = [f for f in required_fields if f not in content]
+                  if missing:
+                      failed.append(f"{path}: missing fields {missing}")
+              except Exception as e:
+                  failed.append(f"{path}: read error — {e}")
+
+          if failed:
+              for e in failed:
+                  print(f"❌ {e}")
+              sys.exit(1)
+
+          count = sum(1 for f in os.listdir(agent_dir) if f.endswith('.md'))
+          print(f"✅ All {count} agent files valid")
+          EOF
+
+      - name: Validate manifest.json sources exist
+        run: |
+          python3 << 'EOF'
+          import re, json, os, sys
+
+          content = re.sub(r'//.*$', '', open('scripts/manifest.json').read(), flags=re.MULTILINE)
+          manifest = json.loads(content)
+          failed = []
+
+          for entry in manifest['entries']:
+              src = entry['source']
+              if not os.path.exists(src):
+                  failed.append(f"source not found: {src}")
+
+          if failed:
+              for e in failed:
+                  print(f"❌ {e}")
+              sys.exit(1)
+
+          print(f"✅ manifest.json: all {len(manifest['entries'])} sources exist")
+          EOF
+

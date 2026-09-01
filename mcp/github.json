@@ -1,0 +1,14 @@
+{
+  // description: GitHub MCP server — enables Copilot to read/write issues, PRs,
+  // branches, and code search directly from the GitHub API.
+  // Requires: GITHUB_TOKEN env var with appropriate scopes.
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
+      }
+    }
+  }
+}

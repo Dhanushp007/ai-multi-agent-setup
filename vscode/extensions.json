@@ -1,0 +1,52 @@
+{
+  "recommendations": [
+    // ── Core (all projects) ──────────────────────────────────────────────────
+    "github.copilot",
+    "github.copilot-chat",
+    "editorconfig.editorconfig",
+    "streetsidesoftware.code-spell-checker",
+    "eamodio.gitlens",
+    "usernamehw.errorlens",
+    "gruntfuggly.todo-tree",
+    "esbenp.prettier-vscode",
+    "christian-kohler.path-intellisense",
+    "pkief.material-icon-theme",
+    "github.vscode-github-actions",
+    "ms-vscode-remote.remote-containers",
+    "ms-azuretools.vscode-docker",
+    "redhat.vscode-yaml",
+    "tamasfe.even-better-toml",
+
+    // ── Testing & REST ───────────────────────────────────────────────────────
+    "humao.rest-client",
+    "ms-playwright.playwright",
+
+    // ── Git / GitHub ─────────────────────────────────────────────────────────
+    "github.vscode-pull-request-github",
+    "mhutchie.git-graph",
+
+    // ── Node / TypeScript ────────────────────────────────────────────────────
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next",
+    "orta.vscode-jest",
+    "vitest.explorer",
+
+    // ── Python ───────────────────────────────────────────────────────────────
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "charliermarsh.ruff",
+    "ms-python.black-formatter",
+    "ms-python.debugpy",
+    "littlefoxteam.vscode-python-test-adapter",
+
+    // ── .NET / C# ────────────────────────────────────────────────────────────
+    "ms-dotnettools.csdevkit",
+    "ms-dotnettools.csharp",
+    "ms-dotnettools.vscode-dotnet-runtime",
+
+    // ── AI / ML ──────────────────────────────────────────────────────────────
+    "ms-toolsai.jupyter",
+    "ms-toolsai.jupyter-keymap",
+    "ms-toolsai.vscode-jupyter-cell-tags"
+  ]
+}

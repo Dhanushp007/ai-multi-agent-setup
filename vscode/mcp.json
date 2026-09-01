@@ -1,0 +1,59 @@
+{
+  // VS Code MCP Server Configuration Template
+  // Drop this into .vscode/mcp.json in your target project.
+  // Enable only the servers relevant to your project — comment out the rest.
+  // Docs: https://code.visualstudio.com/docs/copilot/chat/mcp-servers
+
+  "servers": {
+
+    // ── GitHub ────────────────────────────────────────────────────────────
+    // Read/write issues, PRs, code search, branches via GitHub API.
+    // Requires: GITHUB_TOKEN env var (Settings → Developer settings → Personal access tokens)
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
+      }
+    },
+
+    // ── Filesystem ────────────────────────────────────────────────────────
+    // Allows Copilot to read/write files outside the workspace root.
+    // Set ALLOWED_PATHS to a colon-separated list of permitted directories.
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${env:ALLOWED_PATHS}"]
+    },
+
+    // ── Playwright ────────────────────────────────────────────────────────
+    // Browser automation: run E2E tests, inspect pages, fill forms.
+    // Best for: web projects with Playwright or Cypress test suites.
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+
+    // ── PostgreSQL ────────────────────────────────────────────────────────
+    // Query and inspect a PostgreSQL database.
+    // Requires: DATABASE_URL env var (postgresql://user:pass@host:5432/db)
+    // "postgres": {
+    //   "command": "npx",
+    //   "args": ["-y", "@modelcontextprotocol/server-postgres", "${env:DATABASE_URL}"]
+    // },
+
+    // ── SQLite ────────────────────────────────────────────────────────────
+    // Query a local SQLite database file.
+    // "sqlite": {
+    //   "command": "npx",
+    //   "args": ["-y", "@modelcontextprotocol/server-sqlite", "--db-path", "${workspaceFolder}/db.sqlite"]
+    // },
+
+    // ── Fetch / Web ───────────────────────────────────────────────────────
+    // Fetch URLs and web pages (HTML → markdown).
+    // "fetch": {
+    //   "command": "npx",
+    //   "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    // }
+
+  }
+}

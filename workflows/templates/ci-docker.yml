@@ -1,0 +1,86 @@
+name: CI (Docker)
+# Builds and optionally pushes a Docker image.
+# Usage: jobs: { build: { uses: your-org/setup/.github/workflows/ci-docker.yml@main, ... } }
+
+on:
+  workflow_call:
+    inputs:
+      image-name:
+        description: Docker image name (e.g., my-app)
+        type: string
+        required: true
+      registry:
+        description: Container registry host (e.g., ghcr.io, docker.io)
+        type: string
+        default: ghcr.io
+      context:
+        description: Docker build context path
+        type: string
+        default: .
+      dockerfile:
+        description: Path to Dockerfile
+        type: string
+        default: Dockerfile
+      platforms:
+        description: Target platforms (e.g., linux/amd64,linux/arm64)
+        type: string
+        default: linux/amd64
+    secrets:
+      REGISTRY_TOKEN:
+        description: Token for registry login (falls back to GITHUB_TOKEN)
+        required: false
+
+jobs:
+  build:
+    name: Build & push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU (multi-platform)
+        if: contains(inputs.platforms, ',')
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to ${{ inputs.registry }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ inputs.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.REGISTRY_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ inputs.registry }}/${{ github.repository_owner }}/${{ inputs.image-name }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-,format=short
+          labels: |
+            org.opencontainers.image.title=${{ inputs.image-name }}
+            org.opencontainers.image.source=${{ github.repositoryUrl }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ inputs.context }}
+          file: ${{ inputs.dockerfile }}
+          platforms: ${{ inputs.platforms }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true

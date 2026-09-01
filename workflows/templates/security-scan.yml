@@ -1,0 +1,54 @@
+name: Security Scan (CodeQL)
+# Runs CodeQL static analysis and uploads results to GitHub Security tab.
+
+on:
+  workflow_call:
+    inputs:
+      language:
+        description: >
+          CodeQL language to analyze.
+          Options: javascript-typescript, python, csharp, go, java-kotlin, ruby, swift
+        type: string
+        required: true
+      build-command:
+        description: Custom build command for compiled languages (leave blank for autobuild)
+        type: string
+        default: ""
+      queries:
+        description: CodeQL query suite
+        type: string
+        default: security-extended,security-and-quality
+
+jobs:
+  codeql:
+    name: CodeQL analysis (${{ inputs.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ inputs.language }}
+          queries: ${{ inputs.queries }}
+
+      - name: Autobuild
+        if: inputs.build-command == ''
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Custom build
+        if: inputs.build-command != ''
+        run: ${{ inputs.build-command }}
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:${{ inputs.language }}
+          upload: true

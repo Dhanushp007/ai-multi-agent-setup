@@ -1,0 +1,86 @@
+name: Deploy Container
+# Deploys a container image to a target environment.
+# Customize the "Deploy" step for your platform: kubectl, ECS, Fly.io, Azure, etc.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: Target environment name (must match a GitHub Environment)
+        type: string
+        required: true
+      image:
+        description: Full container image reference to deploy (e.g., ghcr.io/org/app:sha-abc123)
+        type: string
+        required: true
+      service-name:
+        description: Name of the service/deployment to update
+        type: string
+        required: true
+      health-check-url:
+        description: URL to poll for health after deploy (leave blank to skip)
+        type: string
+        default: ""
+    secrets:
+      DEPLOY_TOKEN:
+        description: Credential with deployment permissions (cloud provider token, kubeconfig, etc.)
+        required: true
+    outputs:
+      deploy-url:
+        description: URL of the deployed environment
+        value: ${{ jobs.deploy.outputs.deploy-url }}
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ steps.deploy.outputs.deploy-url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy ${{ inputs.service-name }}
+        id: deploy
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: |
+          echo "🚀 Deploying ${{ inputs.image }} to ${{ inputs.environment }}..."
+
+          # ── Replace this block with your deployment mechanism ──────────────
+          # Kubernetes:
+          #   kubectl set image deployment/${{ inputs.service-name }} \
+          #     app=${{ inputs.image }} --record
+          #
+          # AWS ECS:
+          #   aws ecs update-service --cluster prod \
+          #     --service ${{ inputs.service-name }} \
+          #     --force-new-deployment
+          #
+          # Fly.io:
+          #   flyctl deploy --image ${{ inputs.image }}
+          #
+          # Docker Swarm:
+          #   docker service update --image ${{ inputs.image }} \
+          #     ${{ inputs.service-name }}
+          # ───────────────────────────────────────────────────────────────────
+
+          echo "deploy-url=https://${{ inputs.environment }}.your-domain.com" >> "$GITHUB_OUTPUT"
+
+      - name: Health check
+        if: inputs.health-check-url != ''
+        run: |
+          URL="${{ inputs.health-check-url }}"
+          echo "🔍 Polling $URL ..."
+          for i in $(seq 1 12); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || echo "000")
+            if [ "$STATUS" -eq 200 ]; then
+              echo "✅ Health check passed (attempt $i)"
+              exit 0
+            fi
+            echo "  attempt $i: HTTP $STATUS — retrying in 10s"
+            sleep 10
+          done
+          echo "❌ Health check failed after 12 attempts"
+          exit 1

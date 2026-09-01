@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": "echo \"[Copilot] Session started: $(date)\" >> .copilot/session.log 2>/dev/null || true",
+        "powershell": "New-Item -ItemType Directory -Force -Path '.copilot' | Out-Null; Add-Content -Path '.copilot/session.log' -Value \"[Copilot] Session started: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')\"",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ],
+    "sessionEnd": [
+      {
+        "type": "command",
+        "bash": "echo \"[Copilot] Session ended: $(date)\" >> .copilot/session.log 2>/dev/null || true",
+        "powershell": "Add-Content -Path '.copilot/session.log' -Value \"[Copilot] Session ended: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')\" -ErrorAction SilentlyContinue",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ],
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "#!/bin/sh\n# Block destructive commands on protected branches/files\nINPUT=$(cat)\nCOMMAND=$(echo \"$INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get('tool',''))\" 2>/dev/null || echo '')\nARGS=$(echo \"$INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(str(d.get('args','')))\" 2>/dev/null || echo '')\n# Block rm -rf on source directories\nif echo \"$ARGS\" | grep -qE 'rm.*-rf.*(src|lib|app|components)'; then\n  echo '{\"decision\":\"deny\",\"reason\":\"Blocked destructive rm -rf on source directory\"}'\n  exit 0\nfi\n# Allow everything else\necho '{\"decision\":\"allow\"}'",
+        "powershell": "$input_data = $input | ConvertFrom-Json -ErrorAction SilentlyContinue\n$tool = $input_data.tool\n$args = $input_data.args | Out-String\n# Block rm -rf on source directories\nif ($args -match 'rm.*-rf.*(src|lib|app|components)') {\n  '{\"decision\":\"deny\",\"reason\":\"Blocked destructive rm -rf on source directory\"}'\n} else {\n  '{\"decision\":\"allow\"}'\n}",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "bash": "INPUT=$(cat); TOOL=$(echo \"$INPUT\" | python3 -c \"import sys,json; d=json.load(sys.stdin); print(d.get('tool','unknown'))\" 2>/dev/null || echo 'unknown'); echo \"[$(date '+%H:%M:%S')] tool=$TOOL\" >> .copilot/tool-audit.log 2>/dev/null || true",
+        "powershell": "$input_data = $input | ConvertFrom-Json -ErrorAction SilentlyContinue; $tool = $input_data.tool ?? 'unknown'; Add-Content -Path '.copilot/tool-audit.log' -Value \"[$(Get-Date -Format 'HH:mm:ss')] tool=$tool\" -ErrorAction SilentlyContinue",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ],
+    "agentStop": [
+      {
+        "type": "command",
+        "bash": "echo \"[Copilot] Agent completed at $(date '+%H:%M:%S')\" >> .copilot/session.log 2>/dev/null || true",
+        "powershell": "Add-Content -Path '.copilot/session.log' -Value \"[Copilot] Agent completed at $(Get-Date -Format 'HH:mm:ss')\" -ErrorAction SilentlyContinue",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ],
+    "errorOccurred": [
+      {
+        "type": "command",
+        "bash": "INPUT=$(cat); echo \"[ERROR $(date '+%H:%M:%S')] $INPUT\" >> .copilot/errors.log 2>/dev/null || true",
+        "powershell": "$err = $input | Out-String; Add-Content -Path '.copilot/errors.log' -Value \"[ERROR $(Get-Date -Format 'HH:mm:ss')] $err\" -ErrorAction SilentlyContinue",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Declares which files from this repo get applied to target projects.",
+  "entries": [
+    {
+      "source": ".github/agents",
+      "destination": ".github/agents",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": "prompts",
+      "destination": ".github/prompts",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": "commands",
+      "destination": ".github/commands",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": "skills",
+      "destination": ".github/skills",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": ".github/instructions",
+      "destination": ".github/instructions",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": ".github/hooks",
+      "destination": ".github/hooks",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": "hooks/universal/commit-msg",
+      "destination": ".git/hooks/commit-msg",
+      "mode": "symlink",
+      "stacks": "*"
+    },
+    {
+      "source": "hooks/universal/pre-push",
+      "destination": ".git/hooks/pre-push",
+      "mode": "symlink",
+      "stacks": "*"
+    },
+    {
+      "source": "hooks/node/pre-commit",
+      "destination": ".git/hooks/pre-commit",
+      "mode": "symlink",
+      "stacks": ["node"]
+    },
+    {
+      "source": "hooks/python/pre-commit",
+      "destination": ".git/hooks/pre-commit",
+      "mode": "symlink",
+      "stacks": ["python"]
+    },
+    {
+      "source": "hooks/dotnet/pre-commit",
+      "destination": ".git/hooks/pre-commit",
+      "mode": "symlink",
+      "stacks": ["dotnet"]
+    },
+    {
+      "source": "vscode/settings.json",
+      "destination": ".vscode/settings.json",
+      "mode": "merge",
+      "stacks": "*"
+    },
+    {
+      "source": "vscode/extensions.json",
+      "destination": ".vscode/extensions.json",
+      "mode": "merge",
+      "stacks": "*"
+    },
+    {
+      "source": "vscode/mcp.json",
+      "destination": ".vscode/mcp.json",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": "vscode/tasks.json",
+      "destination": ".vscode/tasks.json",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": "vscode/keybindings.json",
+      "destination": ".vscode/keybindings.json",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": "vscode/lsp.json",
+      "destination": ".github/lsp.json",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": "AGENTS.md",
+      "destination": "AGENTS.md",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": "CLAUDE.md",
+      "destination": "CLAUDE.md",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": "GEMINI.md",
+      "destination": "GEMINI.md",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": ".github/copilot-instructions.md",
+      "destination": ".github/copilot-instructions.md",
+      "mode": "copy",
+      "stacks": "*"
+    },
+    {
+      "source": "mcp",
+      "destination": ".vscode/mcp",
+      "mode": "copy",
+      "stacks": "*",
+      "note": "Individual MCP configs — consumer merges desired ones into .vscode/mcp.json"
+    }
+  ]
+}

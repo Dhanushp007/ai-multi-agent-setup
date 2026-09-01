@@ -1,0 +1,16 @@
+# Local editor and operating-system files
+.DS_Store
+Thumbs.db
+.vscode/*.log
+
+# Local Copilot and agent hook output
+.copilot/
+
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+
+# Temporary files
+*.bak
+*.tmp

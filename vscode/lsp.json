@@ -1,0 +1,66 @@
+{
+  // Repository-level LSP server configuration for GitHub Copilot CLI.
+  // Place this file at .github/lsp.json in target projects.
+  // For user-level config (all projects), edit ~/.copilot/lsp-config.json
+  //
+  // Install language servers separately:
+  //   npm install -g typescript-language-server     (TypeScript/JavaScript)
+  //   npm install -g pyright                        (Python)
+  //   dotnet tool install -g csharp-ls             (.NET/C#)
+  //   npm install -g vscode-langservers-extracted   (HTML/CSS/JSON)
+
+  "lspServers": {
+    // [stack: node]
+    "typescript": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"],
+      "fileExtensions": {
+        ".ts": "typescript",
+        ".tsx": "typescriptreact",
+        ".js": "javascript",
+        ".jsx": "javascriptreact",
+        ".mjs": "javascript",
+        ".cjs": "javascript"
+      }
+    },
+
+    // [stack: python]
+    "python": {
+      "command": "pyright-langserver",
+      "args": ["--stdio"],
+      "fileExtensions": {
+        ".py": "python",
+        ".pyi": "python"
+      }
+    },
+
+    // [stack: dotnet]
+    "csharp": {
+      "command": "csharp-ls",
+      "args": [],
+      "fileExtensions": {
+        ".cs": "csharp",
+        ".csx": "csharp"
+      }
+    },
+
+    // [stack: *] JSON/HTML/CSS (universal)
+    "json": {
+      "command": "vscode-json-language-server",
+      "args": ["--stdio"],
+      "fileExtensions": {
+        ".json": "json",
+        ".jsonc": "jsonc"
+      }
+    },
+    "css": {
+      "command": "vscode-css-language-server",
+      "args": ["--stdio"],
+      "fileExtensions": {
+        ".css": "css",
+        ".scss": "scss",
+        ".less": "less"
+      }
+    }
+  }
+}

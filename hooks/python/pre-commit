@@ -1,0 +1,24 @@
+#!/bin/sh
+# Python pre-commit hook: runs ruff and black on staged .py files.
+
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$')
+
+if [ -z "$staged" ]; then
+  exit 0
+fi
+
+if command -v ruff >/dev/null 2>&1; then
+  echo "$staged" | xargs ruff check
+  if [ $? -ne 0 ]; then
+    echo "ERROR: ruff check failed. Run 'ruff check --fix .' to auto-fix."
+    exit 1
+  fi
+fi
+
+if command -v black >/dev/null 2>&1; then
+  echo "$staged" | xargs black --check
+  if [ $? -ne 0 ]; then
+    echo "ERROR: black format check failed. Run 'black .' to fix."
+    exit 1
+  fi
+fi

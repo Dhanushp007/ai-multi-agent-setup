@@ -1,0 +1,135 @@
+{
+  // Common VS Code task definitions per stack.
+  // Copy to .vscode/tasks.json in your target project and remove irrelevant stacks.
+  // Docs: https://code.visualstudio.com/docs/editor/tasks
+
+  "version": "2.0.0",
+  "tasks": [
+
+    // ── [stack: node] ──────────────────────────────────────────────────────
+    {
+      "label": "npm: install",
+      "type": "npm",
+      "script": "install",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "npm: build",
+      "type": "npm",
+      "script": "build",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "npm: test",
+      "type": "npm",
+      "script": "test",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "npm: lint",
+      "type": "npm",
+      "script": "lint",
+      "group": "test",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "npm: dev",
+      "type": "npm",
+      "script": "dev",
+      "isBackground": true,
+      "group": "build",
+      "problemMatcher": []
+    },
+
+    // ── [stack: python] ────────────────────────────────────────────────────
+    {
+      "label": "python: create venv",
+      "type": "shell",
+      "command": "python -m venv .venv",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "python: install deps",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/pip install -r requirements.txt",
+      "windows": {
+        "command": "${workspaceFolder}\\.venv\\Scripts\\pip install -r requirements.txt"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "python: test",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/pytest",
+      "windows": {
+        "command": "${workspaceFolder}\\.venv\\Scripts\\pytest"
+      },
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "python: lint (ruff)",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/ruff check .",
+      "windows": {
+        "command": "${workspaceFolder}\\.venv\\Scripts\\ruff check ."
+      },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "python: format (ruff + black)",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/ruff check --fix . && ${workspaceFolder}/.venv/bin/black .",
+      "windows": {
+        "command": "${workspaceFolder}\\.venv\\Scripts\\ruff check --fix . && ${workspaceFolder}\\.venv\\Scripts\\black ."
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+
+    // ── [stack: dotnet] ────────────────────────────────────────────────────
+    {
+      "label": "dotnet: restore",
+      "type": "shell",
+      "command": "dotnet restore",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "dotnet: build",
+      "type": "shell",
+      "command": "dotnet build --no-restore",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$msCompile"]
+    },
+    {
+      "label": "dotnet: test",
+      "type": "shell",
+      "command": "dotnet test --no-build --verbosity normal",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": ["$msCompile"]
+    },
+    {
+      "label": "dotnet: format",
+      "type": "shell",
+      "command": "dotnet format",
+      "group": "build",
+      "problemMatcher": ["$msCompile"]
+    },
+    {
+      "label": "dotnet: watch",
+      "type": "shell",
+      "command": "dotnet watch run",
+      "isBackground": true,
+      "group": "build",
+      "problemMatcher": ["$msCompile"]
+    }
+
+  ]
+}

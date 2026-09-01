@@ -1,0 +1,19 @@
+#!/bin/sh
+# Enforces conventional commit message format.
+# Format: <type>(<scope>): <subject>
+# Types: feat|fix|docs|style|refactor|test|chore|ci|perf|revert
+
+commit_msg_file="$1"
+commit_msg=$(cat "$commit_msg_file")
+
+pattern='^(feat|fix|docs|style|refactor|test|chore|ci|perf|revert)(\(.+\))?: .{1,100}$'
+
+if ! echo "$commit_msg" | grep -qE "$pattern"; then
+  echo ""
+  echo "ERROR: Invalid commit message format."
+  echo "  Expected: <type>(<scope>): <subject>"
+  echo "  Example:  feat(auth): add OAuth2 login support"
+  echo "  Types:    feat|fix|docs|style|refactor|test|chore|ci|perf|revert"
+  echo ""
+  exit 1
+fi
