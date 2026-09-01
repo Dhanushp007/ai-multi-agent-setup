@@ -26,12 +26,51 @@ jobs:
       - name: Validate JSON syntax (supports JSONC comments)
         run: |
           python3 << 'EOF'
-          import re, json, os, sys
+          import json, os, sys
+
+          def strip_jsonc_comments(content):
+            result = []
+            in_string = False
+            escaped = False
+            index = 0
+
+            while index < len(content):
+              char = content[index]
+              next_char = content[index + 1] if index + 1 < len(content) else ''
+
+              if in_string:
+                result.append(char)
+                if escaped:
+                  escaped = False
+                elif char == '\\':
+                  escaped = True
+                elif char == '"':
+                  in_string = False
+                index += 1
+              elif char == '"':
+                in_string = True
+                result.append(char)
+                index += 1
+              elif char == '/' and next_char == '/':
+                index += 2
+                while index < len(content) and content[index] not in '\r\n':
+                  index += 1
+              elif char == '/' and next_char == '*':
+                index += 2
+                while index + 1 < len(content) and content[index:index + 2] != '*/':
+                  if content[index] in '\r\n':
+                    result.append(content[index])
+                  index += 1
+                index = min(index + 2, len(content))
+              else:
+                result.append(char)
+                index += 1
+
+            return ''.join(result)
 
           def load_jsonc(path):
-              content = open(path).read()
-              content = re.sub(r'//.*$', '', content, flags=re.MULTILINE)
-              return json.loads(content)
+            with open(path, encoding='utf-8') as file:
+              return json.loads(strip_jsonc_comments(file.read()))
 
           failed = []
           for root, dirs, files in os.walk('.'):
@@ -67,18 +106,19 @@ jobs:
       - name: Validate agent files have required fields
         run: |
           python3 << 'EOF'
-          import os, sys, re
+          import os, sys
 
           required_fields = ['name:', 'description:', 'tools:', 'model:']
           failed = []
 
-            agent_dir = '.github/agents'
-            for fname in os.listdir(agent_dir):
-              if not fname.endswith('.md'):
+          agent_dir = '.github/agents'
+          for fname in os.listdir(agent_dir):
+              if not fname.endswith('.agent.md'):
                   continue
               path = f'{agent_dir}/{fname}'
               try:
-                  content = open(path).read()
+                  with open(path, encoding='utf-8') as file:
+                      content = file.read()
                   missing = [f for f in required_fields if f not in content]
                   if missing:
                       failed.append(f"{path}: missing fields {missing}")
@@ -90,17 +130,17 @@ jobs:
                   print(f"❌ {e}")
               sys.exit(1)
 
-          count = sum(1 for f in os.listdir(agent_dir) if f.endswith('.md'))
+          count = sum(1 for f in os.listdir(agent_dir) if f.endswith('.agent.md'))
           print(f"✅ All {count} agent files valid")
           EOF
 
       - name: Validate manifest.json sources exist
         run: |
           python3 << 'EOF'
-          import re, json, os, sys
+          import json, os, sys
 
-          content = re.sub(r'//.*$', '', open('scripts/manifest.json').read(), flags=re.MULTILINE)
-          manifest = json.loads(content)
+          with open('scripts/manifest.json', encoding='utf-8') as file:
+              manifest = json.load(file)
           failed = []
 
           for entry in manifest['entries']:
