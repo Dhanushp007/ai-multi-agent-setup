@@ -40,7 +40,7 @@ GEMINI.md                         ← Gemini-specific instructions
     feature.yml                   ← feature request form
   workflows/
     validate.yml                  ← CI for this repo (validates YAML, JSON, hooks, manifest)
-`.github/agents/`                ← Copilot agent profiles (.md), one per role
+`.github/agents/`                ← Copilot agent profiles (.agent.md), one per role
 skills/                           ← Agent skill source bundles (subdirs with SKILL.md)
 prompts/                          ← Prompt template source files (*.prompt.md)
 hooks/
@@ -81,8 +81,8 @@ workflows/
 ## Key Conventions
 
 ### Copilot Agents (`.github/agents/`)
-- One file per agent role, named descriptively: `architect.md`, `python-specialist.md`
-- Use `.md` format with YAML frontmatter: `name`, `description`, `tools`, `model`
+- One file per agent role, named descriptively: `architect.agent.md`, `python-specialist.agent.md`
+- Use `.agent.md` format with YAML frontmatter: `name`, `description`, `tools`, `model`
 - When applying to a target project, agents are copied from `.github/agents/` via `scripts/manifest.json`
 - **`master-orchestrator.md`** is the top-level agent — invoke it for any multi-step or multi-domain task
 - All other agents are specialists — the orchestrator routes to them; do not invoke specialists directly for complex tasks

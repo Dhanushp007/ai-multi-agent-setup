@@ -13,7 +13,7 @@ configurations, development tooling, and project scaffolding.
 ## Repository Structure
 
 ```
-.github/agents/   ← 54 specialist agent profiles (.md with YAML frontmatter)
+.github/agents/   ← 54 specialist agent profiles (.agent.md with YAML frontmatter)
 skills/           ← Agent skills (subdirs, each with SKILL.md)
 prompts/          ← Reusable prompt templates (*.prompt.md)
 hooks/            ← Git hooks (universal/, node/, python/, dotnet/)
@@ -32,7 +32,7 @@ workflows/        ← Reusable GitHub Actions workflow templates
 
 ## File Conventions
 
-### Agent files (`.github/agents/*.md`)
+### Agent files (`.github/agents/*.agent.md`)
 ```yaml
 ---
 name: agent-name
@@ -72,7 +72,7 @@ Followed by coding standards for the matched file type.
 ## Key Files
 
 - `scripts/manifest.json` — source of truth for what gets copied where
-- `.github/agents/master-orchestrator.md` — top-level orchestration agent
+- `.github/agents/master-orchestrator.agent.md` — top-level orchestration agent
 - `.github/copilot-instructions.md` — repo-wide Copilot instructions
 - `scripts/apply.ps1` / `apply.sh` — apply configs to target projects
 

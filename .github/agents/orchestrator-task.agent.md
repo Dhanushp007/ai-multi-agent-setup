@@ -1,7 +1,7 @@
 ---
 name: orchestrator-task
 description: Task orchestration specialist for coordinating multi-agent workflows. Use PROACTIVELY for any task requiring more than one specialist agent or spanning multiple technical domains.
-tools: ["Read", "Grep", "Glob"]
+tools: [read, search, agent, todo]
 model: opus
 ---
 

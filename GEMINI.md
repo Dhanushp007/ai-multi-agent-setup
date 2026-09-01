@@ -15,7 +15,7 @@ from here instead of recreating them from scratch.
 
 | Folder | Purpose | Deploys to |
 |--------|---------|-----------|
-| `.github/agents/` | 54 specialist and orchestration agent profiles | `.github/agents/` |
+| `.github/agents/*.agent.md` | 54 specialist and orchestration agent profiles | `.github/agents/` |
 | `skills/` | Agent skill bundles | `.github/skills/` |
 | `prompts/` | Reusable prompt templates | `.github/prompts/` |
 | `hooks/` | Git lifecycle hooks | `.git/hooks/` (via symlink) |

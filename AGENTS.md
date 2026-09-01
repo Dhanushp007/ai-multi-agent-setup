@@ -7,7 +7,7 @@ should follow the conventions below.
 ## Repository Purpose
 
 This repo defines and deploys:
-- **Custom agents** (`.github/agents/`) — 54 specialist and orchestration agents
+- **Custom agents** (`.github/agents/*.agent.md`) — 54 specialist and orchestration agents
 - **Skills** (`skills/`) — task-specific skill bundles deployed to `.github/skills/`
 - **Prompts** (`prompts/`) — reusable prompt templates deployed to `.github/prompts/`
 - **Path instructions** (`.github/instructions/`) — auto-applied per file type
@@ -21,7 +21,7 @@ This repo defines and deploys:
 ## How to Work in This Repo
 
 ### Adding a new agent
-1. Create `.github/agents/<name>.md` with YAML frontmatter (`name`, `description`, `tools`, `model`) and rich Markdown body
+1. Create `.github/agents/<name>.agent.md` with YAML frontmatter (`name`, `description`, `tools`, `model`) and rich Markdown body
 2. Add an entry to `scripts/manifest.json` if it needs special handling
 3. The `master-orchestrator` agent routes all complex tasks — update its routing table if the new agent covers a new domain
 

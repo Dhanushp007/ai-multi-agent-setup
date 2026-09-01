@@ -78,8 +78,13 @@ if (-not (Test-Path $gitDir)) {
         Get-ChildItem $srcDir -File | ForEach-Object {
             $dst = Join-Path $hooksDir $_.Name
             if (Test-Path $dst) { Remove-Item $dst -Force }
-            New-Item -ItemType SymbolicLink -Path $dst -Target $_.FullName | Out-Null
-            Pass "Hook installed: $($_.Name)"
+            try {
+                New-Item -ItemType SymbolicLink -Path $dst -Target $_.FullName -ErrorAction Stop | Out-Null
+                Pass "Hook installed: $($_.Name)"
+            } catch {
+                Copy-Item -Path $_.FullName -Destination $dst -Force
+                Warn "Symlink unavailable; copied hook: $($_.Name)"
+            }
         }
     }
 }

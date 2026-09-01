@@ -90,6 +90,15 @@ Header "Agent file schema"
 $requiredMarkers = @('name:', 'description:', 'model:', '## Your Role', '## Red Flags', '- [ ]')
 $agentDir = Join-Path $repoRoot ".github\agents"
 
+$nonNativeAgents = Get-ChildItem $agentDir -File -Filter "*.md" |
+    Where-Object { $_.Name -notlike "*.agent.md" }
+if ($nonNativeAgents) {
+    $names = $nonNativeAgents.Name -join ", "
+    Fail "Agent files must use the native .agent.md suffix: $names"
+} else {
+    Pass "All agent files use the native .agent.md suffix"
+}
+
 Get-ChildItem $agentDir -Filter "*.md" | ForEach-Object {
     try {
         $content = Get-Content $_.FullName -Raw

@@ -5,6 +5,11 @@ The repository is designed around shared Markdown, JSON, shell, and PowerShell c
 can use the same engineering workflow with GitHub Copilot, Claude, Gemini, and OpenAI Codex where
 the relevant client supports that format.
 
+The primary goal is turnkey multi-agent orchestration: set up a project once, invoke the Master
+Orchestrator, and let it coordinate specialists, reviews, tests, quality gates, and delivery.
+
+Read the [Multi-Agent Orchestration Guide](ORCHESTRATION_GUIDE.md) for the complete workflow.
+
 ## What is included
 
 | Path | Purpose | Native or portable surface |
@@ -42,6 +47,9 @@ Create a new project and apply the setup:
 ```powershell
 .\scripts\new-project.ps1 -Name "my-api" -Stack node
 ```
+
+Then invoke `master-orchestrator` and describe the task, stack, risk, constraints, and definition of
+done. The installed orchestration profiles determine the specialist sequence and quality gates.
 
 On macOS or Linux:
 
